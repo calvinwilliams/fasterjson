@@ -1,0 +1,169 @@
+fasterjson - 最快的JSON解析器
+
+1.概述
+2.编译安装
+3.基本使用
+4.性能
+5.最后
+
+------------------------------------------------------------
+
+1.概述
+
+fasterjson是一个SAX模式的JSON解析器。它直接解析JSON文本，调用注册的事件函数，快速访问JSON中感兴趣的内容。
+fasterjson主要用于只读方式挖掘JSON数据到应用对象中，如JSON配置文件解析、大型JSON报文解包。因为它不像DOM模式需要先构造一个完整的文档树，所以速度非常快，几乎接近strlen的性能。
+fasterjson非常小巧，整个源代码由一对fasterjson.h,fasterjson.c组成，700行，18KB，不依赖于任何其它库，容易嵌入到您的项目中。
+
+2.编译安装
+
+以Linux操作系统为例，每个目录里的构造脚本均是makefile.Linux，外层目录makefile.Linux递归下级子目录
+[code]
+$ cd src
+$ make -f makefile.Linux install
+gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -I.  -c fasterjson.c
+gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -o libfasterjson.so fasterjson.o -shared -L.
+cp -f libfasterjson.so /usr/lib/exlib/
+cp -f fasterjson.h /usr/include/fasterjson/
+[/code]
+
+3.基本使用
+
+fasterjson使用接口函数只有三个，下面依次说明之
+
+[code]
+typedef int funcCallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size , char *node , int node_len , char *content , int content_len , void *p );
+int TravelJsonBuffer( char *json_buffer , char *jpath , int jpath_size
+		, funcCallbackOnJsonNode *pfuncCallbackOnJsonNode
+		, void *p );
+int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_size
+		, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
+		, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
+		, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+		, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+		, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
+		, void *p );
+[/code]
+函数TravelJsonBuffer读入JSON文本并快速解析之，当遇到JSON树枝或JSON树叶时调用pfuncCallbackOnJsonNode呼叫应用访问，应用可根据type确定读到了树枝事件或树叶事件等，以及jpath，筛选访问感兴趣的JSON节点。
+函数TravelJsonBuffer4是TravelJsonBuffer事件细分版本。
+
+下面是一个简单的示例
+[code]
+funcCallbackOnJsonNode CallbackOnJsonNode ;
+int CallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size , char *nodename , int nodename_len , char *content , int content_len , void *p )
+{
+	if( type & FASTERJSON_NODE_BRANCH )
+	{
+		if( type & FASTERJSON_NODE_ENTER )
+		{
+			printf( "ENTER-BRANCH p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+		else if( type & FASTERJSON_NODE_LEAVE )
+		{
+			printf( "LEAVE-BRANCH p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+	}
+	else if( type & FASTERJSON_NODE_ARRAY )
+	{
+		if( type & FASTERJSON_NODE_ENTER )
+		{
+			printf( "ENTER-ARRAY  p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+		else if( type & FASTERJSON_NODE_LEAVE )
+		{
+			printf( "LEAVE-ARRAY  p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+	}
+	else if( type & FASTERJSON_NODE_LEAF )
+	{
+		printf( "LEAF         p[%s] jpath[%.*s] nodename[%.*s] content[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename , content_len , content );
+	}
+	
+	return 0;
+}
+
+...
+char	jpath[ 1024 + 1 ] ;
+char	*json_buffer = NULL ;
+char	*p = "hello world" ;
+
+memset( jpath , 0x00 , sizeof(jpath) );
+nret = TravelJsonBuffer( json_buffer , jpath , sizeof(jpath) , & CallbackOnJsonNode , p ) ;
+free( json_buffer );
+if( nret && nret != FASTJSON_INFO_END_OF_BUFFER )
+{
+	printf( "TravelJsonTree failed[%d]\n" , nret );
+	return nret;
+}
+...
+[/code]
+
+执行之，输出为
+[code]
+$ cat test_basic.json
+{
+       root :
+       {
+               leaf : content ,
+               sub_branch:
+               {
+                       sub_leaf:sub_content ,
+                       "sub_leaf 2":"sub_content 2"
+               }
+       } ,
+       "root2" : "leaf2"
+}
+$ ./test_fasterjson test_basic.json
+ENTER-BRANCH p[hello world] jpath[/root] nodename[root]
+LEAF         p[hello world] jpath[/root/leaf] nodename[leaf] content[content]
+ENTER-BRANCH p[hello world] jpath[/root/sub_branch] nodename[sub_branch]
+LEAF         p[hello world] jpath[/root/sub_branch/sub_leaf] nodename[sub_leaf] content[sub_content]
+LEAF         p[hello world] jpath[/root/sub_branch/sub_leaf 2] nodename[sub_leaf 2] content[sub_content 2]
+LEAVE-BRANCH p[hello world] jpath[/root/sub_branch] nodename[sub_branch]
+LEAVE-BRANCH p[hello world] jpath[/root] nodename[root]
+LEAF         p[hello world] jpath[/root2] nodename[root2] content[leaf2]
+[/code]
+
+客户可以改造事件回调函数，实现快速遍历访问JSON，比如根据JSON某些JPATH数据填充一个C结构体相关成员。
+
+4.性能
+
+fasterjson的性能非常高，下面是fasterjson与目前宣称最快JSON解析器rapidjson的压测比较
+压测用JSON文件test_big_and_lang.json约622KB(17870行)，里面包含大量节点、重复节点、各种编码以及少量注释。
+[code]
+~/exsrc/fasterjson-1.0.0/test $ ls -l test_big_and_lang.json
+-rw-r--r-- 1 calvin calvin 622511 Sep 21 10:51 test_big_and_lang.json
+~/exsrc/fasterjson-1.0.0/test $ wc test_big_and_lang.json
+17870  26332 622511 test_big_and_lang.json
+[/code]
+
+首先是fasterjson开跑10次，取最好成绩
+[code]
+~/exsrc/fasterjson-1.0.0/test $ time ./press_fasterjson test_big.json 1000000
+Elapse 3 seconds
+
+real    0m3.445s
+user    0m3.401s
+sys     0m0.010s
+[/code]
+遍历测试JSON文件所有树枝、树叶1000次，耗时约3秒。
+
+然后是rapidjson开跑10次，取最好成绩
+[code]
+~/exsrc/fasterjson-1.0.0/test_rapidjson $ time ./press_rapidjson ../test/test_big.json 1000000
+Elapse 10 seconds
+
+real    0m9.733s
+user    0m9.623s
+sys     0m0.017s
+[/code]
+遍历测试JSON文件所有树枝、树叶1000000次，耗时约10秒。
+
+可见fasterjson比rapidjson快了约3倍，fasterjson夺取了JSON(SAX)性能桂冠。
+
+5.最后
+
+欢迎使用fasterjson，如果你使用中碰到了问题请告诉我，谢谢 ^_^
+首页传送门 : [url]http://git.oschina.net/calvinwilliams/fasterjson[/url]
+作者邮箱   : calvinwilliams.c@gmail.com
+
+

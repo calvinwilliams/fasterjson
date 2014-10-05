@@ -1,0 +1,166 @@
+fasterjson - the faster json parser
+
+1.Overview
+2.Compiling and installation
+3.Basic Use
+4.Performance
+5.Finally
+
+------------------------------------------------------------
+
+1.Overview
+
+Fasterjson is a JSON(SAX) parser. It directly parse JSON text, call registered event functions, fast access JSON content of your interest.
+Fasterjson is used in access JSON data read-only, such as parsing JSON configuration file, or unpacking large JSON. Because it is not like the DOM model need to construct a complete document tree, so the speed is very fast, almost close to the performance of strlen(). 
+Fasterjson is very small, the entire source code consists of a pair fasterjson.h and fasterjson.c,500 lines,13KB,not depend on any other libraries, easily embedded in your project.
+
+2.Compiling and installation
+
+for example, Linux
+[code]
+$ cd src
+$ make -f makefile.Linux install
+gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -I.  -c fasterjson.c
+gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -o libfasterjson.so fasterjson.o -shared -L.
+cp -f libfasterjson.so /usr/lib/exlib/
+cp -f fasterjson.h /usr/include/fasterjson/
+[/code]
+
+3.Basic Use
+
+Only three interface functions in fasterjson
+
+[code]
+typedef int funcCallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size , char *node , int node_len , char *content , int content_len , void *p );
+int TravelJsonBuffer( char *json_buffer , char *jpath , int jpath_size
+		, funcCallbackOnJsonNode *pfuncCallbackOnJsonNode
+		, void *p );
+int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_size
+		, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
+		, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
+		, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+		, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+		, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
+		, void *p );
+[/code]
+Function TravelJsonBuffer() read JSON text and fast parsing, call pfuncCallbackOnJsonNode() when accessing JSON branches or leaves , application can be determined branches or leaves events by type and jpath, visit data interested.
+Function TravelJsonBuffer4 is event subdivided version.
+
+The following is a simple example
+[code]
+funcCallbackOnJsonNode CallbackOnJsonNode ;
+int CallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size , char *nodename , int nodename_len , char *content , int content_len , void *p )
+{
+	if( type & FASTERJSON_NODE_BRANCH )
+	{
+		if( type & FASTERJSON_NODE_ENTER )
+		{
+			printf( "ENTER-BRANCH p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+		else if( type & FASTERJSON_NODE_LEAVE )
+		{
+			printf( "LEAVE-BRANCH p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+	}
+	else if( type & FASTERJSON_NODE_ARRAY )
+	{
+		if( type & FASTERJSON_NODE_ENTER )
+		{
+			printf( "ENTER-ARRAY  p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+		else if( type & FASTERJSON_NODE_LEAVE )
+		{
+			printf( "LEAVE-ARRAY  p[%s] jpath[%.*s] nodename[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename );
+		}
+	}
+	else if( type & FASTERJSON_NODE_LEAF )
+	{
+		printf( "LEAF         p[%s] jpath[%.*s] nodename[%.*s] content[%.*s]\n" , (char*)p , jpath_len , jpath , nodename_len , nodename , content_len , content );
+	}
+	
+	return 0;
+}
+
+...
+char	jpath[ 1024 + 1 ] ;
+char	*json_buffer = NULL ;
+char	*p = "hello world" ;
+
+memset( jpath , 0x00 , sizeof(jpath) );
+nret = TravelJsonBuffer( json_buffer , jpath , sizeof(jpath) , & CallbackOnJsonNode , p ) ;
+free( json_buffer );
+if( nret && nret != FASTJSON_INFO_END_OF_BUFFER )
+{
+	printf( "TravelJsonTree failed[%d]\n" , nret );
+	return nret;
+}
+...
+[/code]
+
+For output
+[code]
+$ cat test_basic.json
+{
+       root :
+       {
+               leaf : content ,
+               sub_branch:
+               {
+                       sub_leaf:sub_content ,
+                       "sub_leaf 2":"sub_content 2"
+               }
+       } ,
+       "root2" : "leaf2"
+}
+$ ./test_fasterjson test_basic.json
+ENTER-BRANCH p[hello world] jpath[/root] nodename[root]
+LEAF         p[hello world] jpath[/root/leaf] nodename[leaf] content[content]
+ENTER-BRANCH p[hello world] jpath[/root/sub_branch] nodename[sub_branch]
+LEAF         p[hello world] jpath[/root/sub_branch/sub_leaf] nodename[sub_leaf] content[sub_content]
+LEAF         p[hello world] jpath[/root/sub_branch/sub_leaf 2] nodename[sub_leaf 2] content[sub_content 2]
+LEAVE-BRANCH p[hello world] jpath[/root/sub_branch] nodename[sub_branch]
+LEAVE-BRANCH p[hello world] jpath[/root] nodename[root]
+LEAF         p[hello world] jpath[/root2] nodename[root2] content[leaf2]
+[/code]
+
+You can transform event callback function, rapid access JSON nodes, for example, according to certain JPATH then fill c struct members.
+
+4.Performance
+
+Fastjson's performance is very high, below is fasterjson and rapidjson pressure measurement
+[code]
+~/exsrc/fasterjson-1.0.0/test $ ls -l test_big_and_lang.json
+-rw-r--r-- 1 calvin calvin 622511 Sep 21 10:51 test_big_and_lang.json
+~/exsrc/fasterjson-1.0.0/test $ wc test_big_and_lang.json
+17870  26332 622511 test_big_and_lang.json
+[/code]
+
+fasterjson runs 10 times, get the best results
+[code]
+~/exsrc/fasterjson-1.0.0/test $ time ./press_fastjson test_big.json 1000000
+Elapse 3 seconds
+
+real    0m3.445s
+user    0m3.401s
+sys     0m0.010s
+[/code]
+Iterates through all leaves and branches on 1000 times, it took about 3 seconds.
+
+rapidjson runs 10 times, get the best results
+[code]
+~/exsrc/fasterjson-1.0.0/test_rapidjson $ time ./press_rapidjson ../test/test_big.json 1000000
+Elapse 10 seconds
+
+real    0m9.733s
+user    0m9.623s
+sys     0m0.017s
+[/code]
+Iterates through all leaves and branches on 1000000 times, it took about 10 seconds.
+
+fasterjson is faster than rapidjson about 3 times.
+
+5.Finally
+
+Welcome to use fasterjson, if you have any problems, please tell me, thank you ^_^
+Project home page : [url]https://github.com/calvinwilliams/fasterjson[/url]
+Author email      : calvinwilliams.c@gmail.com
