@@ -38,6 +38,7 @@
 			{						\
 				_newlen_++;				\
 				(_buf_)++;				\
+				(_buf_remain_len_)--;			\
 			}						\
 		}							\
 	}								\

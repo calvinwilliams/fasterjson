@@ -327,11 +327,12 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		if( tag != FASTERJSON_TOKEN_TEXT )
 			return FASTERJSON_ERROR_JSON_INVALID;
 		
+		nodename = begin ;
+		nodename_len = len ;
+		
 		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_JSON_INVALID)
 		if( tag == FASTERJSON_TOKEN_COLON )
 		{
-			nodename = begin ;
-			nodename_len = len ;
 		}
 		else if( tag == FASTERJSON_TOKEN_COMMA )
 		{
@@ -523,6 +524,9 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		}
 		else if( tag == FASTERJSON_TOKEN_LSB )
 		{
+			nodename = begin ;
+			nodename_len = len ;
+			
 			if( pfuncCallbackOnEnterJsonArray )
 			{
 				nret = (*pfuncCallbackOnEnterJsonArray)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_ARRAY , jpath , jpath_newlen , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;

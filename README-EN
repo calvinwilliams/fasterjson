@@ -10,7 +10,7 @@ fasterjson - the faster json parser
 
 1.Overview
 
-Fasterjson is a JSON(SAX) parser. It directly parse JSON text, call registered event functions, fast access JSON content of your interest.
+Fasterjson is a fast JSON(SAX) parser. It directly parse JSON text, call registered event functions, fast access JSON content of your interest.
 Fasterjson is used in access JSON data read-only, such as parsing JSON configuration file, or unpacking large JSON. Because it is not like the DOM model need to construct a complete document tree, so the speed is very fast, almost close to the performance of strlen(). 
 Fasterjson is very small, the entire source code consists of a pair fasterjson.h and fasterjson.c,500 lines,13KB,not depend on any other libraries, easily embedded in your project.
 

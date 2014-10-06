@@ -10,7 +10,7 @@ fasterjson - 最快的JSON解析器
 
 1.概述
 
-fasterjson是一个SAX模式的JSON解析器。它直接解析JSON文本，调用注册的事件函数，快速访问JSON中感兴趣的内容。
+fasterjson是一个快速SAX模式的JSON解析器。它直接解析JSON文本，调用注册的事件函数，快速访问JSON中感兴趣的内容。
 fasterjson主要用于只读方式挖掘JSON数据到应用对象中，如JSON配置文件解析、大型JSON报文解包。因为它不像DOM模式需要先构造一个完整的文档树，所以速度非常快，几乎接近strlen的性能。
 fasterjson非常小巧，整个源代码由一对fasterjson.h,fasterjson.c组成，700行，18KB，不依赖于任何其它库，容易嵌入到您的项目中。
 
