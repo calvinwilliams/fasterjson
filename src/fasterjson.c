@@ -9,7 +9,7 @@
 #define MAX(_a_,_b_) (_a_>_b_?_a_:_b_)
 #endif
 
-int __FASTERJSON_VERSION_1_0_0 ;
+int __FASTERJSON_VERSION_1_0_1 ;
 
 #define FASTERJSON_TOKEN_EOF		-1
 #define FASTERJSON_TOKEN_LBB		1	/* { */
@@ -120,7 +120,7 @@ int __FASTERJSON_VERSION_1_0_0 ;
 			break;						\
 		}							\
 		(_begin_) = (_base_) ;					\
-		if( *(_begin_) == '\"' )				\
+		if( *(_begin_) == '"' || *(_begin_) == '\'' )		\
 		{							\
 			(_begin_)++;					\
 			(_base_)++;					\
@@ -133,7 +133,7 @@ int __FASTERJSON_VERSION_1_0_0 ;
 					(_base_)++;			\
 					continue;			\
 				}					\
-				if( *(_base_) == '\"' )			\
+				if( *(_base_) == *(begin-1) )		\
 				{					\
 					(_len_) = (_base_) - (_begin_) ;	\
 					(_tag_) = FASTERJSON_TOKEN_TEXT ;	\

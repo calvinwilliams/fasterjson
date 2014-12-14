@@ -1,3 +1,10 @@
+#ifndef _H_FASTERJSON_
+#define _H_FASTERJSON_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,4 +100,10 @@ _WINDLL_FUNC int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_
 				, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 				, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 				, void *p );
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 

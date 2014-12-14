@@ -5,7 +5,7 @@
 		sub_branch:
 		{
 			sub_leaf:sub_content ,
-			"sub_leaf 2":"sub_content 2"
+			"sub_leaf 2":'sub_content 2'
 		}
 	} ,
 	"root2" : "leaf2"
