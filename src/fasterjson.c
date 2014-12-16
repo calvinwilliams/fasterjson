@@ -153,7 +153,7 @@ int __FASTERJSON_VERSION_1_0_1 ;
 			{						\
 				if( (unsigned char)*(_base_) > 127 )	\
 					continue;			\
-				if( strchr( " \t\r\n{}[]:" , *(_base_) ) )	\
+				if( strchr( " \t\r\n{}[]:," , *(_base_) ) )	\
 				{						\
 					(_len_) = (_base_) - (_begin_) ;	\
 					(_tag_) = FASTERJSON_TOKEN_TEXT ;	\
