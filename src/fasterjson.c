@@ -631,11 +631,11 @@ int TravelJsonBuffer( char *json_buffer , char *jpath , int jpath_size
 	char		*json_ptr = json_buffer ;
 	
 	return _TravelJsonBuffer( & json_ptr , jpath , 0 , jpath_size
-				, pfuncCallbackOnJsonNode
-				, pfuncCallbackOnJsonNode
-				, pfuncCallbackOnJsonNode
-				, pfuncCallbackOnJsonNode
-				, pfuncCallbackOnJsonNode
+				, pfuncCallbackOnEnterJsonBranch
+				, pfuncCallbackOnLeaveJsonBranch
+				, pfuncCallbackOnEnterJsonArray
+				, pfuncCallbackOnLeaveJsonArray
+				, pfuncCallbackOnJsonLeaf
 				, p );
 }
 
