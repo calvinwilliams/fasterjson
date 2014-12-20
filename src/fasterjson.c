@@ -20,6 +20,8 @@ int __FASTERJSON_VERSION_1_0_1 ;
 #define FASTERJSON_TOKEN_COMMA		6	/* , */
 #define FASTERJSON_TOKEN_TEXT		9
 
+#define FASTERJSON_INFO_END_OF_BUFFER	13
+
 #define TOKENJSON(_base_,_begin_,_len_,_tag_,_eof_ret_)			\
 	do								\
 	{								\
@@ -546,6 +548,15 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			if( nret )
 				return nret;
 			
+			if( pfuncCallbackOnLeaveJsonArray )
+			{
+				nret = (*pfuncCallbackOnLeaveJsonArray)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_ARRAY , jpath , jpath_newlen , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
+				if( nret > 0 )
+					break;
+				else if( nret < 0 )
+					return nret;
+			}
+			
 			if( jpath )
 			{
 				if( jpath_len + 1 + nodename_len < jpath_size-1 - 1 )
@@ -562,15 +573,6 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 				{
 					jpath_newlen = jpath_len ;
 				}
-			}
-			
-			if( pfuncCallbackOnLeaveJsonArray )
-			{
-				nret = (*pfuncCallbackOnLeaveJsonArray)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_ARRAY , jpath , jpath_newlen , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
-				if( nret > 0 )
-					break;
-				else if( nret < 0 )
-					return nret;
 			}
 		}
 		else
@@ -612,10 +614,10 @@ static int _TravelJsonBuffer( register char **json_ptr , char *jpath , int jpath
 	{
 		return _TravelJsonLeafBuffer( json_ptr , jpath , jpath_len , jpath_size
 					, pfuncCallbackOnEnterJsonBranch
-					, pfuncCallbackOnEnterJsonBranch
-					, pfuncCallbackOnEnterJsonBranch
-					, pfuncCallbackOnEnterJsonBranch
-					, pfuncCallbackOnEnterJsonBranch
+					, pfuncCallbackOnLeaveJsonBranch
+					, pfuncCallbackOnEnterJsonArray
+					, pfuncCallbackOnLeaveJsonArray
+					, pfuncCallbackOnJsonLeaf
 					, p );
 	}
 	else
@@ -630,13 +632,19 @@ int TravelJsonBuffer( char *json_buffer , char *jpath , int jpath_size
 {
 	char		*json_ptr = json_buffer ;
 	
-	return _TravelJsonBuffer( & json_ptr , jpath , 0 , jpath_size
-				, pfuncCallbackOnEnterJsonBranch
-				, pfuncCallbackOnLeaveJsonBranch
-				, pfuncCallbackOnEnterJsonArray
-				, pfuncCallbackOnLeaveJsonArray
-				, pfuncCallbackOnJsonLeaf
-				, p );
+	int		nret = 0 ;
+	
+	nret = _TravelJsonBuffer( & json_ptr , jpath , 0 , jpath_size
+				, pfuncCallbackOnJsonNode
+				, pfuncCallbackOnJsonNode
+				, pfuncCallbackOnJsonNode
+				, pfuncCallbackOnJsonNode
+				, pfuncCallbackOnJsonNode
+				, p ) ;
+	if( nret == 0 || nret == FASTERJSON_INFO_END_OF_BUFFER )
+		return 0;
+	else
+		return nret;
 }
 
 int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_size
@@ -649,12 +657,18 @@ int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_size
 {
 	char		*json_ptr = json_buffer ;
 	
-	return _TravelJsonBuffer( & json_ptr , jpath , 0 , jpath_size
+	int		nret = 0 ;
+	
+	nret = _TravelJsonBuffer( & json_ptr , jpath , 0 , jpath_size
 				, pfuncCallbackOnEnterJsonBranch
 				, pfuncCallbackOnLeaveJsonBranch
 				, pfuncCallbackOnEnterJsonArray
 				, pfuncCallbackOnLeaveJsonArray
 				, pfuncCallbackOnJsonLeaf
-				, p );
+				, p ) ;
+	if( nret == 0 || nret == FASTERJSON_INFO_END_OF_BUFFER )
+		return 0;
+	else
+		return nret;
 }
 
