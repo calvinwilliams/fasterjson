@@ -38,11 +38,11 @@ BIN		=	test_fasterjson \
 
 ###### 编译选项
 CFLAGS		=	-I. \
-			/usr/include/fasterjson \
+			-I/usr/include/fasterjson \
 
 ###### 链接选项
 LFLAGS		=	-L. \
-			/usr/lib \
+			-L/usr/lib \
 			-lfasterjson \
 
 ###### 额外宏定义区
