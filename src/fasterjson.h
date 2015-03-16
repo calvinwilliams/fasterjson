@@ -27,7 +27,13 @@ extern "C" {
 		int	_newlen_ ;					\
 		for( _newlen_ = 0 ; _newlen_ < (_buf_len_) ; )		\
 		{							\
-			if( *(_buf_) == '\"' )				\
+			if( (unsigned char)*(_buf_) > 127 )		\
+			{						\
+				_newlen_+=2;				\
+				(_buf_)+=2;				\
+				(_buf_remain_len_)-=2;			\
+			}						\
+			else if( *(_buf_) == '\"' )			\
 			{						\
 				if( (_buf_remain_len_) < 2-1 )		\
 				{					\
@@ -50,30 +56,46 @@ extern "C" {
 		}							\
 	}								\
 
-#define JSONUNESCAPE_FOLD(_src_,_src_len_,_dst_)			\
+#define JSONUNESCAPE_FOLD(_src_,_src_len_,_dst_,_dst_remain_len_,_overflow_process_)	\
 	if( (_src_len_) > 0 )						\
 	{								\
 		char	*_p_src_ = (_src_) ;				\
 		char	*_p_src_end_ = (_src_) + (_src_len_) - 1 ;	\
 		char	*_p_dst_ = (_dst_) ;				\
-		for( (_src_len_) = 0 ; (_p_src_) <= _p_src_end_ ; )	\
+		int	_remain_len_ = (_dst_remain_len_) ;		\
+		for( ; (_p_src_) <= _p_src_end_ && _remain_len_ >= 0 ; )\
 		{							\
-			if( strncmp( (_p_src_) , "\\\"" , 2 ) == 0 )	\
+			if( (unsigned char)*(_p_src_) > 127 )		\
+			{						\
+				*(_p_dst_) = *(_p_src_) ;		\
+				(_p_dst_)++;				\
+				(_p_src_)++;				\
+				_remain_len_--;				\
+				*(_p_dst_) = *(_p_src_) ;		\
+				(_p_dst_)++;				\
+				(_p_src_)++;				\
+				_remain_len_--;				\
+			}						\
+			else if( strncmp( (_p_src_) , "\\\"" , 2 ) == 0 )	\
 			{						\
 				*(_p_dst_) = '\"' ;			\
 				(_p_dst_)++;				\
 				(_p_src_) += 2 ;			\
-				(_src_len_)++;				\
+				_remain_len_--;				\
 			}						\
 			else						\
 			{						\
 				*(_p_dst_) = *(_p_src_) ;		\
 				(_p_dst_)++;				\
 				(_p_src_)++;				\
-				(_src_len_)++;				\
+				_remain_len_--;				\
 			}						\
 		}							\
 		*(_p_dst_) = '\0' ;					\
+		if( _remain_len_ < 0 )					\
+		{							\
+			_overflow_process_;				\
+		}							\
 	}								\
 
 /* fastjson */

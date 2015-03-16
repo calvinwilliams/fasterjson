@@ -1,3 +1,7 @@
+ver 1.0.2	2015-03-16	calvin
+		* Fixed a problem when dealing with double-byte characters
+		* Fixed a problem of buffer overflow protection
+
 ver 1.0.1	2014-12-14	calvin
 		* Fixed a problems that string enclosed in single-quotation
 
