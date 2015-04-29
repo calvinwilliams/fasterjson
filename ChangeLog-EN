@@ -1,3 +1,6 @@
+ver 1.0.3	2015-04-29	calvin
+		* Performance optimization
+
 ver 1.0.2	2015-03-16	calvin
 		* Fixed a problem when dealing with double-byte characters
 		* Fixed a problem of buffer overflow protection

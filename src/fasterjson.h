@@ -76,7 +76,7 @@ extern "C" {
 				(_p_src_)++;				\
 				_remain_len_--;				\
 			}						\
-			else if( strncmp( (_p_src_) , "\\\"" , 2 ) == 0 )	\
+			else if( memcmp( (_p_src_) , "\\\"" , 2 ) == 0 )\
 			{						\
 				*(_p_dst_) = '\"' ;			\
 				(_p_dst_)++;				\

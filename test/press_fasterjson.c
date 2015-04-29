@@ -143,7 +143,7 @@ int main( int argc , char *argv[] )
 				json_buffer = json_buffer_bak ;
 				memset( jpath , 0x00 , sizeof(jpath) );
 				nret = TravelJsonBuffer( json_buffer , jpath , sizeof(jpath) , NULL , (void*)p ) ;
-				if( nret && nret != FASTERJSON_INFO_END_OF_BUFFER )
+				if( nret )
 				{
 					printf( "TravelJsonTree failed[%d]\n" , nret );
 					free( json_buffer );

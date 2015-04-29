@@ -150,7 +150,7 @@ int main( int argc , char *argv[] )
 		memset( jpath , 0x00 , sizeof(jpath) );
 		nret = TravelJsonBuffer( json_buffer , jpath , sizeof(jpath) , & CallbackOnJsonNode , p ) ;
 		free( json_buffer );
-		if( nret && nret != FASTERJSON_INFO_END_OF_BUFFER )
+		if( nret )
 		{
 			printf( "TravelJsonTree failed[%d]\n" , nret );
 			return nret;

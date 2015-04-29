@@ -259,13 +259,15 @@ static int _TravelJsonArrayBuffer( register char **json_ptr , char *jpath , int 
 			{
 				if( jpath_len + 1 + 1 < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/." );
+					memcpy( jpath + jpath_len , "/." , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
@@ -351,13 +353,15 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			{
 				if( jpath_len + 1 + 1 < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/." );
+					memcpy( jpath + jpath_len , "/." , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
@@ -385,13 +389,15 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			{
 				if( jpath_len + 1 + 1 < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/." );
+					memcpy( jpath + jpath_len , "/." , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
@@ -419,13 +425,15 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			{
 				if( jpath_len + 1 + 1 < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/." );
+					memcpy( jpath + jpath_len , "/." , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
@@ -453,13 +461,16 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		{
 			if( jpath_len + 1 + nodename_len < jpath_size-1 - 1 )
 			{
-				sprintf( jpath + jpath_len , "/%.*s" , (int)nodename_len , nodename );
+				*( jpath + jpath_len ) = '/' ;
+				memcpy( jpath + jpath_len + 1 , nodename , (int)nodename_len );
 				jpath_newlen = jpath_len + 1 + nodename_len ;
+				*( jpath + jpath_newlen ) = '\0' ;
 			}
 			else if( jpath_len + 1 + 1 <= jpath_size-1 )
 			{
-				sprintf( jpath + jpath_len , "/*" );
+				memcpy( jpath + jpath_len , "/*" , 2 );
 				jpath_newlen = jpath_len + 1 + 1 ;
+				*( jpath + jpath_newlen ) = '\0' ;
 			}
 			else
 			{
@@ -507,13 +518,16 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			{
 				if( jpath_len + 1 + nodename_len < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/%.*s" , (int)nodename_len , nodename );
+					*( jpath + jpath_len ) = '/' ;
+					memcpy( jpath + jpath_len + 1 , nodename , (int)nodename_len );
 					jpath_newlen = jpath_len + 1 + nodename_len ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
@@ -567,13 +581,16 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			{
 				if( jpath_len + 1 + nodename_len < jpath_size-1 - 1 )
 				{
-					sprintf( jpath + jpath_len , "/%.*s" , (int)nodename_len , nodename );
+					*( jpath + jpath_len ) = '/' ;
+					memcpy( jpath + jpath_len + 1 , nodename , (int)nodename_len );
 					jpath_newlen = jpath_len + 1 + nodename_len ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else if( jpath_len + 1 + 1 <= jpath_size-1 )
 				{
-					sprintf( jpath + jpath_len , "/*" );
+					memcpy( jpath + jpath_len , "/*" , 2 );
 					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
 				}
 				else
 				{
