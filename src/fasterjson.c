@@ -9,7 +9,7 @@
 #define MAX(_a_,_b_) (_a_>_b_?_a_:_b_)
 #endif
 
-int __FASTERJSON_VERSION_1_0_2 ;
+int __FASTERJSON_VERSION_1_1_0 ;
 
 #define FASTERJSON_TOKEN_EOF		-1
 #define FASTERJSON_TOKEN_LBB		1	/* { */
@@ -21,6 +21,8 @@ int __FASTERJSON_VERSION_1_0_2 ;
 #define FASTERJSON_TOKEN_TEXT		9
 
 #define FASTERJSON_INFO_END_OF_BUFFER	13
+
+char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 
 #define TOKENJSON(_base_,_begin_,_len_,_tag_,_eof_ret_)			\
 	do								\
@@ -130,8 +132,33 @@ int __FASTERJSON_VERSION_1_0_2 ;
 			{						\
 				if( (unsigned char)*(_base_) > 127 )	\
 				{					\
-					(_base_)++;			\
-					continue;			\
+					if( g_fasterjson_encoding == FASTERJSON_ENCODING_UTF8 )		\
+					{								\
+						if( (*(_base_))>>5 == 0x06 && (*(_base_+1))>>6 == 0x02 )\
+						{							\
+							(_base_)++;					\
+						}							\
+						else if( (*(_base_))>>4 == 0x0E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=2;					\
+						}							\
+						else if( (*(_base_))>>3 == 0x1E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=3;					\
+						}							\
+						else if( (*(_base_))>>2 == 0x3E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 && (*(_base_+4))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=4;					\
+						}							\
+						else if( (*(_base_))>>1 == 0x7E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 && (*(_base_+4))>>6 == 0x02 && (*(_base_+5))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=5;					\
+						}							\
+					}								\
+					else if( g_fasterjson_encoding == FASTERJSON_ENCODING_GB18030 )	\
+					{								\
+						(_base_)++;						\
+					}								\
 				}					\
 				if( *(_base_) == '\\' )			\
 				{					\
@@ -140,7 +167,7 @@ int __FASTERJSON_VERSION_1_0_2 ;
 				}					\
 				if( *(_base_) == *(begin-1) )		\
 				{					\
-					(_len_) = (_base_) - (_begin_) ;	\
+					(_len_) = (_base_) - (_begin_) ;\
 					(_tag_) = FASTERJSON_TOKEN_TEXT ;	\
 					(_base_)++;			\
 					break;				\
@@ -158,8 +185,33 @@ int __FASTERJSON_VERSION_1_0_2 ;
 			{						\
 				if( (unsigned char)*(_base_) > 127 )	\
 				{					\
-					(_base_)++;			\
-					continue;			\
+					if( g_fasterjson_encoding == FASTERJSON_ENCODING_UTF8 )		\
+					{								\
+						if( (*(_base_))>>5 == 0x06 && (*(_base_+1))>>6 == 0x02 )\
+						{							\
+							(_base_)++;					\
+						}							\
+						else if( (*(_base_))>>4 == 0x0E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=2;					\
+						}							\
+						else if( (*(_base_))>>3 == 0x1E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=3;					\
+						}							\
+						else if( (*(_base_))>>2 == 0x3E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 && (*(_base_+4))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=4;					\
+						}							\
+						else if( (*(_base_))>>1 == 0x7E && (*(_base_+1))>>6 == 0x02 && (*(_base_+2))>>6 == 0x02 && (*(_base_+3))>>6 == 0x02 && (*(_base_+4))>>6 == 0x02 && (*(_base_+5))>>6 == 0x02 )	\
+						{							\
+							(_base_)+=5;					\
+						}							\
+					}								\
+					else if( g_fasterjson_encoding == FASTERJSON_ENCODING_GB18030 )	\
+					{								\
+						(_base_)++;						\
+					}								\
 				}					\
 				if( strchr( " \t\r\n{}[]:," , *(_base_) ) )	\
 				{						\

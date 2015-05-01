@@ -106,12 +106,11 @@ int CallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size 
 
 int main( int argc , char *argv[] )
 {
-	char	jpath[ 1024 + 1 ] ;
-	char	*json_buffer = NULL ;
-	int	json_len ;
-	
 	if( argc == 1 + 2 )
 	{
+		char		jpath[ 1024 + 1 ] ;
+		char		*json_buffer = NULL ;
+		int		json_len ;
 		char		*json_buffer_bak = NULL ;
 		int		c , count ;
 		char		*p = "hello world" ;

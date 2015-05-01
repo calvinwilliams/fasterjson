@@ -105,13 +105,12 @@ static int ReadEntireFileSafely( char *filename , char *mode , char **pbuf , lon
 
 int main( int argc , char *argv[] )
 {
-	char	*json_buffer = NULL ;
-	int	json_len ;
-	
 	if( argc == 1 + 2 )
 	{
 		char		*json_buffer_bak = NULL ;
 		int		c , count ;
+		char		*json_buffer = NULL ;
+		int		json_len ;
 		int		nret = 0 ;
 		
 		nret = ReadEntireFileSafely( argv[1] , "rb" , & json_buffer_bak , NULL ) ;
@@ -144,6 +143,7 @@ int main( int argc , char *argv[] )
 					printf("error :%d\n", doc.GetParseError());
 					return 2;
 				}
+				memcpy( json_buffer , json_buffer_bak , json_len );
 #else
 				Reader	reader ;
 				InsituStringStream is(json_buffer);
@@ -154,10 +154,8 @@ int main( int argc , char *argv[] )
 					printf("error :%d\n", r.Code());
 					return 2;
 				}
-#endif
-					
-				
 				memcpy( json_buffer , json_buffer_bak , json_len );
+#endif
 			}
 			time( & t2 );
 			printf( "Elapse %d seconds\n" , (int)(t2-t1) );
@@ -174,6 +172,8 @@ int main( int argc , char *argv[] )
 			}
 			printf( "len[%d]\n" , len );
 		}
+		free( json_buffer );
+		free( json_buffer_bak );
 	}
 	else
 	{

@@ -21,82 +21,189 @@ extern "C" {
 #endif
 #endif
 
-#define JSONESCAPE_EXPAND(_buf_,_buf_len_,_buf_remain_len_)		\
-	if( (_buf_len_) > 0 )						\
-	{								\
-		int	_newlen_ ;					\
-		for( _newlen_ = 0 ; _newlen_ < (_buf_len_) ; )		\
-		{							\
-			if( (unsigned char)*(_buf_) > 127 )		\
-			{						\
-				_newlen_+=2;				\
-				(_buf_)+=2;				\
-				(_buf_remain_len_)-=2;			\
-			}						\
-			else if( *(_buf_) == '\"' )			\
-			{						\
-				if( (_buf_remain_len_) < 2-1 )		\
-				{					\
-					(_buf_len_) = -1 ;		\
-					break;				\
-				}					\
-				memmove( (_buf_)+2 , (_buf_)+1 , (_buf_len_)-_newlen_-1 );	\
-				memcpy( (_buf_) , "\\\"" , 2 );		\
-				(_buf_) += 2 ;				\
-				(_buf_len_) += 2-1 ;			\
-				_newlen_ += 2 ;				\
-				(_buf_remain_len_) -= 2-1 ;		\
-			}						\
-			else						\
-			{						\
-				_newlen_++;				\
-				(_buf_)++;				\
-				(_buf_remain_len_)--;			\
-			}						\
-		}							\
-	}								\
+#define JSONENCODING_SKIP_MULTIBYTE								\
+				if( g_fasterjson_encoding == FASTERJSON_ENCODING_UTF8 )		\
+				{								\
+					if( (*(_p_src_))>>5 == 0x06 && (*(_p_src_+1))>>6 == 0x02 )	\
+					{							\
+						_remain_len_-=2; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+					else if( (*(_p_src_))>>4 == 0x0E && (*(_p_src_+1))>>6 == 0x02 && (*(_p_src_+2))>>6 == 0x02 )	\
+					{							\
+						_remain_len_-=3; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+					else if( (*(_p_src_))>>3 == 0x1E && (*(_p_src_+1))>>6 == 0x02 && (*(_p_src_+2))>>6 == 0x02 && (*(_p_src_+3))>>6 == 0x02 )	\
+					{							\
+						_remain_len_-=4; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+					else if( (*(_p_src_))>>2 == 0x3E && (*(_p_src_+1))>>6 == 0x02 && (*(_p_src_+2))>>6 == 0x02 && (*(_p_src_+3))>>6 == 0x02 && (*(_p_src_+4))>>6 == 0x02 )	\
+					{							\
+						_remain_len_-=4; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+					else if( (*(_p_src_))>>1 == 0x7E && (*(_p_src_+1))>>6 == 0x02 && (*(_p_src_+2))>>6 == 0x02 && (*(_p_src_+3))>>6 == 0x02 && (*(_p_src_+4))>>6 == 0x02 && (*(_p_src_+5))>>6 == 0x02 )	\
+					{							\
+						_remain_len_-=4; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+					else							\
+					{							\
+						_remain_len_--; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = *(_p_src_++) ;			\
+					}							\
+				}								\
+				else if( g_fasterjson_encoding == FASTERJSON_ENCODING_GB18030 )	\
+				{								\
+					_remain_len_-=2; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = *(_p_src_++) ;				\
+					*(_p_dst_++) = *(_p_src_++) ;				\
+				}								\
+				else								\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = *(_p_src_++) ;				\
+				}								\
 
-#define JSONUNESCAPE_FOLD(_src_,_src_len_,_dst_,_dst_remain_len_,_overflow_process_)	\
-	if( (_src_len_) > 0 )						\
-	{								\
-		char	*_p_src_ = (_src_) ;				\
-		char	*_p_src_end_ = (_src_) + (_src_len_) - 1 ;	\
-		char	*_p_dst_ = (_dst_) ;				\
-		int	_remain_len_ = (_dst_remain_len_) ;		\
-		for( ; (_p_src_) <= _p_src_end_ && _remain_len_ >= 0 ; )\
-		{							\
-			if( (unsigned char)*(_p_src_) > 127 )		\
-			{						\
-				*(_p_dst_) = *(_p_src_) ;		\
-				(_p_dst_)++;				\
-				(_p_src_)++;				\
-				_remain_len_--;				\
-				*(_p_dst_) = *(_p_src_) ;		\
-				(_p_dst_)++;				\
-				(_p_src_)++;				\
-				_remain_len_--;				\
-			}						\
-			else if( memcmp( (_p_src_) , "\\\"" , 2 ) == 0 )\
-			{						\
-				*(_p_dst_) = '\"' ;			\
-				(_p_dst_)++;				\
-				(_p_src_) += 2 ;			\
-				_remain_len_--;				\
-			}						\
-			else						\
-			{						\
-				*(_p_dst_) = *(_p_src_) ;		\
-				(_p_dst_)++;				\
-				(_p_src_)++;				\
-				_remain_len_--;				\
-			}						\
-		}							\
-		*(_p_dst_) = '\0' ;					\
-		if( _remain_len_ < 0 )					\
-		{							\
-			_overflow_process_;				\
-		}							\
-	}								\
+#define JSONESCAPE_EXPAND(_src_,_src_len_,_dst_,_dst_len_,_dst_remain_len_)			\
+	(_dst_len_) = 0 ;									\
+	if( (_src_len_) > 0 )									\
+	{											\
+		unsigned char	*_p_src_ = (unsigned char *)(_src_) ;				\
+		unsigned char	*_p_src_end_ = (unsigned char *)(_src_) + (_src_len_) - 1 ;	\
+		unsigned char	*_p_dst_ = (unsigned char *)(_dst_) ;				\
+		int		_remain_len_ = (_dst_remain_len_) ;				\
+		while( _p_src_ <= _p_src_end_ )							\
+		{										\
+			if( *(_p_src_) > 127 )							\
+			{									\
+				JSONENCODING_SKIP_MULTIBYTE					\
+			}									\
+			else if( *(_p_src_) == '\"' || *(_p_src_) == '\\' )			\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = *(_p_src_) ;					\
+				(_p_src_)++;							\
+			}									\
+			else									\
+			{									\
+				_remain_len_--; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = *(_p_src_++) ;					\
+			}									\
+		}										\
+		*(_p_dst_) = '\0' ;								\
+		if( _remain_len_ < 0 || _p_src_ <= _p_src_end_ )				\
+		{										\
+			(_dst_len_) = -1 ;							\
+		}										\
+		else										\
+		{										\
+			(_dst_len_) = (_p_dst_) - (unsigned char *)(_dst_) ;			\
+		}										\
+	}											\
+
+#define JSONUNESCAPE_FOLD(_src_,_src_len_,_dst_,_dst_len_,_dst_remain_len_)			\
+	(_dst_len_) = 0 ;									\
+	if( (_src_len_) > 0 )									\
+	{											\
+		unsigned char	*_p_src_ = (unsigned char *)(_src_) ;				\
+		unsigned char	*_p_src_end_ = (unsigned char *)(_src_) + (_src_len_) - 1 ;	\
+		unsigned char	*_p_dst_ = (unsigned char *)(_dst_) ;				\
+		int		_remain_len_ = (_dst_remain_len_) ;				\
+		while( _p_src_ <= _p_src_end_ )							\
+		{										\
+			if( *(_p_src_) > 127 )							\
+			{									\
+				JSONENCODING_SKIP_MULTIBYTE					\
+			}									\
+			else if( *(_p_src_) == '\\' )						\
+			{									\
+				if( *(_p_src_+1) == 'u' )					\
+				{								\
+					if( *(_p_src_+2) == '0' && *(_p_src_+3) == '0' )	\
+					{							\
+						char	*hexset = "0123456789aAbBcCdDeEfF" ;	\
+						char	*p4 , *p5 ;				\
+						int	c4 , c5 ;				\
+						p4 = strchr( hexset , *(char*)(_p_src_+4) ) ;	\
+						p5 = strchr( hexset , *(char*)(_p_src_+5) ) ;	\
+						if( p4 == NULL || p5 == NULL )			\
+						{						\
+							break;					\
+						}						\
+						c4 = p4 - hexset ;				\
+						c5 = p5 - hexset ;				\
+						if( c4 >= 10 ) c4 = 10+(c4-10)/2 ;		\
+						if( c5 >= 10 ) c5 = 10+(c5-10)/2 ;		\
+						_remain_len_--; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = c4 * 16 + c5 ;			\
+						(_p_src_)+=6;					\
+					}							\
+					else							\
+					{							\
+						char	*hexset = "0123456789aAbBcCdDeEfF" ;	\
+						char	*p2 , *p3 , *p4 , *p5 ;			\
+						int	c2 , c3 , c4 , c5 ;			\
+						p2 = strchr( hexset , *(char*)(_p_src_+2) ) ;	\
+						p3 = strchr( hexset , *(char*)(_p_src_+3) ) ;	\
+						p4 = strchr( hexset , *(char*)(_p_src_+4) ) ;	\
+						p5 = strchr( hexset , *(char*)(_p_src_+5) ) ;	\
+						if( p2 == NULL || p3 == NULL || p4 == NULL || p5 == NULL )	\
+						{						\
+							break;					\
+						}						\
+						c2 = p2 - hexset ;				\
+						c3 = p3 - hexset ;				\
+						c4 = p4 - hexset ;				\
+						c5 = p5 - hexset ;				\
+						if( c2 >= 10 ) c2 = 10+(c2-10)/2 ;		\
+						if( c3 >= 10 ) c3 = 10+(c3-10)/2 ;		\
+						if( c4 >= 10 ) c4 = 10+(c4-10)/2 ;		\
+						if( c5 >= 10 ) c5 = 10+(c5-10)/2 ;		\
+						_remain_len_-=2; if( _remain_len_ < 0 ) break;	\
+						*(_p_dst_++) = c2 * 16 + c3 ;			\
+						*(_p_dst_++) = c4 * 16 + c5 ;			\
+						(_p_src_)+=6;					\
+					}							\
+				}								\
+				else								\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = *(_p_src_+1) ;				\
+					(_p_src_)+=2;						\
+				}								\
+			}									\
+			else									\
+			{									\
+				_remain_len_--; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = *(_p_src_++) ;					\
+			}									\
+		}										\
+		*(_p_dst_) = '\0' ;								\
+		if( _remain_len_ < 0 || _p_src_ <= _p_src_end_ )				\
+		{										\
+			(_dst_len_) = -1 ;							\
+		}										\
+		else										\
+		{										\
+			(_dst_len_) = (_p_dst_) - (unsigned char *)(_dst_) ;			\
+		}										\
+	}											\
 
 /* fastjson */
 
@@ -121,6 +228,10 @@ _WINDLL_FUNC int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_
 				, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 				, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 				, void *p );
+
+#define FASTERJSON_ENCODING_UTF8		0 /* UTF-8 */
+#define FASTERJSON_ENCODING_GB18030		1 /* GB18030/GBK/GB2312 */
+extern char		g_fasterjson_encoding ;
 
 #ifdef __cplusplus
 }

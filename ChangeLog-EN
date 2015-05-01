@@ -1,3 +1,7 @@
+ver 1.1.0	2015-05-01	calvin
+		* Support encoding UTF-8 or GB18030/GBk/GB2312
+		* Support uneacape for "\uxxxx"
+
 ver 1.0.3	2015-04-29	calvin
 		* Performance optimization
 
