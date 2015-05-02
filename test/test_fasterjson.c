@@ -136,15 +136,36 @@ int main( int argc , char *argv[] )
 	char	*json_buffer = NULL ;
 	char	*p = "hello world" ;
 	
-	if( argc == 1 + 1 )
+	if( argc >= 1 + 1 )
 	{
 		int		nret = 0 ;
 		
-		nret = ReadEntireFileSafely( argv[1] , "rb" , & json_buffer , NULL ) ;
-		if( nret )
+		if( argc == 1 + 1 )
 		{
-			printf( "ReadEntireFileSafely[%s] failed[%d]\n" , argv[1] , nret );
-			return nret;
+			nret = ReadEntireFileSafely( argv[1] , "rb" , & json_buffer , NULL ) ;
+			if( nret )
+			{
+				printf( "ReadEntireFileSafely[%s] failed[%d]\n" , argv[1] , nret );
+				return nret;
+			}
+		}
+		else
+		{
+			if( strcmp( argv[1] , "UTF8" ) == 0 )
+			{
+				g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
+			}
+			else if( strcmp( argv[1] , "GB18030" ) == 0 )
+			{
+				g_fasterjson_encoding = FASTERJSON_ENCODING_GB18030 ;
+			}
+			
+			nret = ReadEntireFileSafely( argv[2] , "rb" , & json_buffer , NULL ) ;
+			if( nret )
+			{
+				printf( "ReadEntireFileSafely[%s] failed[%d]\n" , argv[2] , nret );
+				return nret;
+			}
 		}
 		
 		memset( jpath , 0x00 , sizeof(jpath) );

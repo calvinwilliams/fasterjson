@@ -9,6 +9,8 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+extern int __FASTERJSON_VERSION_1_1_1 ;
+
 /* util */
 
 #if ( defined _WIN32 )
@@ -100,6 +102,41 @@ extern "C" {
 				*(_p_dst_++) = *(_p_src_) ;					\
 				(_p_src_)++;							\
 			}									\
+			else if( *(_p_src_) == '\t' )						\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = 't' ;						\
+				(_p_src_)++;							\
+			}									\
+			else if( *(_p_src_) == '\r' )						\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = 'r' ;						\
+				(_p_src_)++;							\
+			}									\
+			else if( *(_p_src_) == '\n' )						\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = 'n' ;						\
+				(_p_src_)++;							\
+			}									\
+			else if( *(_p_src_) == '\b' )						\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = 'b' ;						\
+				(_p_src_)++;							\
+			}									\
+			else if( *(_p_src_) == '\f' )						\
+			{									\
+				_remain_len_-=2; if( _remain_len_ < 0 ) break;			\
+				*(_p_dst_++) = '\\' ;						\
+				*(_p_dst_++) = 'f' ;						\
+				(_p_src_)++;							\
+			}									\
 			else									\
 			{									\
 				_remain_len_--; if( _remain_len_ < 0 ) break;			\
@@ -133,7 +170,37 @@ extern "C" {
 			}									\
 			else if( *(_p_src_) == '\\' )						\
 			{									\
-				if( *(_p_src_+1) == 'u' )					\
+				if( *(_p_src_+1) == 't' )					\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = '\t' ;					\
+					(_p_src_)+=2;						\
+				}								\
+				else if( *(_p_src_+1) == 'r' )					\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = '\r' ;					\
+					(_p_src_)+=2;						\
+				}								\
+				else if( *(_p_src_+1) == 'n' )					\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = '\n' ;					\
+					(_p_src_)+=2;						\
+				}								\
+				else if( *(_p_src_+1) == 'b' )					\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = '\b' ;					\
+					(_p_src_)+=2;						\
+				}								\
+				else if( *(_p_src_+1) == 'f' )					\
+				{								\
+					_remain_len_--; if( _remain_len_ < 0 ) break;		\
+					*(_p_dst_++) = '\f' ;					\
+					(_p_src_)+=2;						\
+				}								\
+				else if( *(_p_src_+1) == 'u' )					\
 				{								\
 					if( *(_p_src_+2) == '0' && *(_p_src_+3) == '0' )	\
 					{							\
@@ -207,15 +274,22 @@ extern "C" {
 
 /* fastjson */
 
-#define FASTERJSON_ERROR_INTERNAL	-11
-#define FASTERJSON_ERROR_JSON_INVALID	-12
-#define FASTERJSON_ERROR_FILENAME	-14
+#define FASTERJSON_ERROR_INTERNAL			-110
+#define FASTERJSON_ERROR_FILENAME			-111
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_0	-121
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_1	-131
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_2	-132
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_3	-133
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_4	-134
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_ARRAY_1	-141
+#define FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_ARRAY_2	-142
+#define FASTERJSON_ERROR_END_OF_BUFFER			-150
 
-#define FASTERJSON_NODE_BRANCH		0x10
-#define FASTERJSON_NODE_LEAF		0x20
-#define FASTERJSON_NODE_ARRAY		0x40
-#define FASTERJSON_NODE_ENTER		0x01
-#define FASTERJSON_NODE_LEAVE		0x02
+#define FASTERJSON_NODE_BRANCH				0x10
+#define FASTERJSON_NODE_LEAF				0x20
+#define FASTERJSON_NODE_ARRAY				0x40
+#define FASTERJSON_NODE_ENTER				0x01
+#define FASTERJSON_NODE_LEAVE				0x02
 
 typedef int funcCallbackOnJsonNode( int type , char *jpath , int jpath_len , int jpath_size , char *node , int node_len , char *content , int content_len , void *p );
 _WINDLL_FUNC int TravelJsonBuffer( char *json_buffer , char *jpath , int jpath_size

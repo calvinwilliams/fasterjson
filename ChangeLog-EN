@@ -1,3 +1,6 @@
+ver 1.1.1	2015-05-02	calvin
+		* Passed json standard calibration testing by 'test/data/*' , with some fault tolerance
+
 ver 1.1.0	2015-05-01	calvin
 		* Support encoding UTF-8 or GB18030/GBk/GB2312
 		* Support uneacape for "\uxxxx"
@@ -13,4 +16,4 @@ ver 1.0.1	2014-12-14	calvin
 		* Fixed a problems that string enclosed in single-quotation
 
 ver 1.0.0	2014-10-02	calvin
-		* create
+		* Create

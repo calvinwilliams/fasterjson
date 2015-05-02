@@ -9,7 +9,7 @@
 #define MAX(_a_,_b_) (_a_>_b_?_a_:_b_)
 #endif
 
-int __FASTERJSON_VERSION_1_1_0 ;
+int __FASTERJSON_VERSION_1_1_1 = 0 ;
 
 #define FASTERJSON_TOKEN_EOF		-1
 #define FASTERJSON_TOKEN_LBB		1	/* { */
@@ -20,7 +20,7 @@ int __FASTERJSON_VERSION_1_1_0 ;
 #define FASTERJSON_TOKEN_COMMA		6	/* , */
 #define FASTERJSON_TOKEN_TEXT		9
 
-#define FASTERJSON_INFO_END_OF_BUFFER	13
+#define FASTERJSON_INFO_END_OF_BUFFER	150
 
 char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 
@@ -262,6 +262,8 @@ static int _TravelJsonArrayBuffer( register char **json_ptr , char *jpath , int 
 	int		len ;
 	signed char	tag ;
 	
+	char		*nodename = NULL ;
+	int		nodename_len ;
 	char		*content = NULL ;
 	int		content_len ;
 	
@@ -271,38 +273,8 @@ static int _TravelJsonArrayBuffer( register char **json_ptr , char *jpath , int 
 	
 	while(1)
 	{
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_INFO_END_OF_BUFFER)
-		if( tag == FASTERJSON_TOKEN_LBB )
-		{
-			if( pfuncCallbackOnEnterJsonBranch )
-			{
-				nret = (*pfuncCallbackOnEnterJsonBranch)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , array_nodename , array_nodename_len , NULL , 0 , p ) ;
-				if( nret > 0 )
-					break;
-				else if( nret < 0 )
-					return nret;
-			}
-			
-			nret = _TravelJsonLeafBuffer( json_ptr , jpath , jpath_len , jpath_size
-						, pfuncCallbackOnEnterJsonBranch
-						, pfuncCallbackOnLeaveJsonBranch
-						, pfuncCallbackOnEnterJsonArray
-						, pfuncCallbackOnLeaveJsonArray
-						, pfuncCallbackOnJsonLeaf
-						, p ) ;
-			if( nret )
-				return nret;
-			
-			if( pfuncCallbackOnLeaveJsonBranch )
-			{
-				nret = (*pfuncCallbackOnLeaveJsonBranch)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , array_nodename , array_nodename_len , NULL , 0 , p ) ;
-				if( nret > 0 )
-					break;
-				else if( nret < 0 )
-					return nret;
-			}
-		}
-		else if( tag == FASTERJSON_TOKEN_TEXT )
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
+		if( tag == FASTERJSON_TOKEN_TEXT )
 		{
 			content = begin ;
 			content_len = len ;
@@ -336,12 +308,100 @@ static int _TravelJsonArrayBuffer( register char **json_ptr , char *jpath , int 
 					return nret;
 			}
 		}
+		else if( tag == FASTERJSON_TOKEN_LBB )
+		{
+			if( pfuncCallbackOnEnterJsonBranch )
+			{
+				nret = (*pfuncCallbackOnEnterJsonBranch)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , array_nodename , array_nodename_len , NULL , 0 , p ) ;
+				if( nret > 0 )
+					break;
+				else if( nret < 0 )
+					return nret;
+			}
+			
+			nret = _TravelJsonLeafBuffer( json_ptr , jpath , jpath_len , jpath_size
+						, pfuncCallbackOnEnterJsonBranch
+						, pfuncCallbackOnLeaveJsonBranch
+						, pfuncCallbackOnEnterJsonArray
+						, pfuncCallbackOnLeaveJsonArray
+						, pfuncCallbackOnJsonLeaf
+						, p ) ;
+			if( nret )
+				return nret;
+			
+			if( pfuncCallbackOnLeaveJsonBranch )
+			{
+				nret = (*pfuncCallbackOnLeaveJsonBranch)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , array_nodename , array_nodename_len , NULL , 0 , p ) ;
+				if( nret > 0 )
+					break;
+				else if( nret < 0 )
+					return nret;
+			}
+		}
+		else if( tag == FASTERJSON_TOKEN_LSB )
+		{
+			nodename = begin ;
+			nodename_len = len ;
+			
+			if( pfuncCallbackOnEnterJsonArray )
+			{
+				nret = (*pfuncCallbackOnEnterJsonArray)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_ARRAY , jpath , jpath_newlen , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
+				if( nret > 0 )
+					break;
+				else if( nret < 0 )
+					return nret;
+			}
+			
+			nret = _TravelJsonArrayBuffer( json_ptr , jpath , jpath_newlen , jpath_size
+						, pfuncCallbackOnEnterJsonBranch
+						, pfuncCallbackOnLeaveJsonBranch
+						, pfuncCallbackOnEnterJsonArray
+						, pfuncCallbackOnLeaveJsonArray
+						, pfuncCallbackOnJsonLeaf
+						, p , nodename , nodename_len ) ;
+			if( nret )
+				return nret;
+			
+			if( pfuncCallbackOnLeaveJsonArray )
+			{
+				nret = (*pfuncCallbackOnLeaveJsonArray)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_ARRAY , jpath , jpath_newlen , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
+				if( nret > 0 )
+					break;
+				else if( nret < 0 )
+					return nret;
+			}
+			
+			if( jpath )
+			{
+				if( jpath_len + 1 + nodename_len < jpath_size-1 - 1 )
+				{
+					*( jpath + jpath_len ) = '/' ;
+					memcpy( jpath + jpath_len + 1 , nodename , (int)nodename_len );
+					jpath_newlen = jpath_len + 1 + nodename_len ;
+					*( jpath + jpath_newlen ) = '\0' ;
+				}
+				else if( jpath_len + 1 + 1 <= jpath_size-1 )
+				{
+					memcpy( jpath + jpath_len , "/*" , 2 );
+					jpath_newlen = jpath_len + 1 + 1 ;
+					*( jpath + jpath_newlen ) = '\0' ;
+				}
+				else
+				{
+					jpath_newlen = jpath_len ;
+				}
+			}
+		}
+		else if( tag == FASTERJSON_TOKEN_RSB )
+		{
+			break;
+		}
 		else
 		{
-			return FASTERJSON_ERROR_JSON_INVALID;
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_ARRAY_1;
 		}
 		
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_JSON_INVALID)
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
 		if( tag == FASTERJSON_TOKEN_COMMA )
 		{
 		}
@@ -355,7 +415,7 @@ static int _TravelJsonArrayBuffer( register char **json_ptr , char *jpath , int 
 		}
 		else
 		{
-			return FASTERJSON_ERROR_JSON_INVALID;
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_ARRAY_2;
 		}
 	}
 	
@@ -385,14 +445,16 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 	
 	while(1)
 	{
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_INFO_END_OF_BUFFER)
-		if( tag != FASTERJSON_TOKEN_TEXT )
-			return FASTERJSON_ERROR_JSON_INVALID;
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
+		if( tag == FASTERJSON_TOKEN_RBB )
+			break;
+		else if( tag != FASTERJSON_TOKEN_TEXT )
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_1;
 		
 		nodename = begin ;
 		nodename_len = len ;
 		
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_JSON_INVALID)
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
 		if( tag == FASTERJSON_TOKEN_COLON )
 		{
 		}
@@ -506,7 +568,7 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		}
 		else
 		{
-			return FASTERJSON_ERROR_JSON_INVALID;
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_2;
 		}
 		
 		if( jpath )
@@ -530,7 +592,7 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 			}
 		}
 		
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_JSON_INVALID)
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
 		if( tag == FASTERJSON_TOKEN_TEXT )
 		{
 			content = begin ;
@@ -652,10 +714,10 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		}
 		else
 		{
-			return FASTERJSON_ERROR_JSON_INVALID;
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_3;
 		}
 		
-		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_JSON_INVALID)
+		TOKENJSON(*json_ptr,begin,len,tag,FASTERJSON_ERROR_END_OF_BUFFER)
 		if( tag == FASTERJSON_TOKEN_COMMA )
 		{
 		}
@@ -665,7 +727,7 @@ static int _TravelJsonLeafBuffer( register char **json_ptr , char *jpath , int j
 		}
 		else
 		{
-			return FASTERJSON_ERROR_JSON_INVALID;
+			return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_4;
 		}
 	}
 	
@@ -695,9 +757,25 @@ static int _TravelJsonBuffer( register char **json_ptr , char *jpath , int jpath
 					, pfuncCallbackOnJsonLeaf
 					, p );
 	}
+	else if( tag == FASTERJSON_TOKEN_LSB )
+	{
+		char	*nodename ;
+		int	nodename_len ;
+		
+		nodename = begin ;
+		nodename_len = len ;
+		
+		return _TravelJsonArrayBuffer( json_ptr , jpath , jpath_len , jpath_size
+					, pfuncCallbackOnEnterJsonBranch
+					, pfuncCallbackOnLeaveJsonBranch
+					, pfuncCallbackOnEnterJsonArray
+					, pfuncCallbackOnLeaveJsonArray
+					, pfuncCallbackOnJsonLeaf
+					, p , nodename , nodename_len );
+	}
 	else
 	{
-		return FASTERJSON_ERROR_JSON_INVALID;
+		return FASTERJSON_ERROR_JSON_INVALID_ON_TOKEN_LEAF_0;
 	}
 }
 
