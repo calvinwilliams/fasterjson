@@ -174,7 +174,7 @@ int main( int argc , char *argv[] )
 		if( nret )
 		{
 			printf( "TravelJsonTree failed[%d]\n" , nret );
-			return nret;
+			return -nret;
 		}
 	}
 	else
