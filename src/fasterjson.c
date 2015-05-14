@@ -13,7 +13,7 @@
 #define MAX(_a_,_b_) (_a_>_b_?_a_:_b_)
 #endif
 
-int __FASTERJSON_VERSION_1_1_1 = 0 ;
+int __FASTERJSON_VERSION_1_1_2 = 0 ;
 
 #define FASTERJSON_TOKEN_EOF		-1
 #define FASTERJSON_TOKEN_LBB		1	/* { */
@@ -81,7 +81,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 		}							\
 		if( (_tag_) )						\
 			break;						\
-		if( (_base_)[0] == '{' )				\
+		else if( (_base_)[0] == '{' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -89,7 +89,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 			(_tag_) = FASTERJSON_TOKEN_LBB ;		\
 			break;						\
 		}							\
-		if( (_base_)[0] == '}' )				\
+		else if( (_base_)[0] == '}' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -97,7 +97,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 			(_tag_) = FASTERJSON_TOKEN_RBB ;		\
 			break;						\
 		}							\
-		if( (_base_)[0] == '[' )				\
+		else if( (_base_)[0] == '[' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -105,7 +105,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 			(_tag_) = FASTERJSON_TOKEN_LSB ;		\
 			break;						\
 		}							\
-		if( (_base_)[0] == ']' )				\
+		else if( (_base_)[0] == ']' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -113,7 +113,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 			(_tag_) = FASTERJSON_TOKEN_RSB ;		\
 			break;						\
 		}							\
-		if( (_base_)[0] == ':' )				\
+		else if( (_base_)[0] == ':' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -121,7 +121,7 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 			(_tag_) = FASTERJSON_TOKEN_COLON ;		\
 			break;						\
 		}							\
-		if( (_base_)[0] == ',' )				\
+		else if( (_base_)[0] == ',' )				\
 		{							\
 			(_begin_) = (_base_) ;				\
 			(_len_) = 1 ;					\
@@ -166,27 +166,27 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 					{								\
 						(_base_)++;						\
 					}								\
-				}					\
-				if( strchr( "\t\r\n" , *(_base_) ) )	\
-				{					\
-					return FASTERJSON_ERROR_JSON_INVALID;	\
-				}					\
-				if( *(_base_) == '\\' )			\
-				{					\
-					(_base_)++;			\
+				}							\
+				else if( strchr( "\t\r\n" , *(_base_) ) )		\
+				{							\
+					return FASTERJSON_ERROR_JSON_INVALID;		\
+				}							\
+				else if( *(_base_) == '\\' )				\
+				{							\
+					(_base_)++;					\
 					if( strchr( "trnfbu\"\\/" , *(_base_) ) )	\
-						continue;		\
-					else				\
+						continue;				\
+					else						\
 						return FASTERJSON_ERROR_JSON_INVALID;	\
-				}					\
-				if( *(_base_) == (_quotes_) )		\
-				{					\
-					(_len_) = (_base_) - (_begin_) ;\
-					(_tag_) = FASTERJSON_TOKEN_TEXT ;\
-					(_base_)++;			\
-					break;				\
-				}					\
-			}						\
+				}							\
+				else if( *(_base_) == (_quotes_) )			\
+				{							\
+					(_len_) = (_base_) - (_begin_) ;		\
+					(_tag_) = FASTERJSON_TOKEN_TEXT ;		\
+					(_base_)++;					\
+					break;						\
+				}							\
+			}								\
 			if( *(_base_) == '\0' && (_tag_) == '\0' )	\
 			{						\
 				return _eof_ret_;			\
@@ -233,19 +233,19 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 						(_base_)++;						\
 					}								\
 				}									\
-				if( strchr( " {}[]:,\r\n" , *(_base_) ) )					\
+				else if( strchr( " {}[]:,\r\n" , *(_base_) ) )				\
 				{									\
 					(_len_) = (_base_) - (_begin_) ;				\
 					(_tag_) = FASTERJSON_TOKEN_TEXT ;				\
 					break;								\
 				}									\
-				if( leading_zero_flag == 1 )						\
+				else if( leading_zero_flag == 1 )					\
 				{									\
 					if( *(_base_) != '.' )						\
 						return FASTERJSON_ERROR_JSON_INVALID;			\
 					leading_zero_flag = 0 ;						\
 				}									\
-				if( strchr( "\\()" , *(_base_) ) )					\
+				else if( strchr( "\\()" , *(_base_) ) )					\
 				{									\
 					return FASTERJSON_ERROR_JSON_INVALID;				\
 				}									\
@@ -260,12 +260,12 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 				if( len != 4 || MEMCMP( (_begin_) , != , "true" , len ) )		\
 					return FASTERJSON_ERROR_JSON_INVALID;				\
 			}										\
-			if( *(_begin_) == 'f' )								\
+			else if( *(_begin_) == 'f' )							\
 			{										\
 				if( len != 5 || MEMCMP( (_begin_) , != , "false" , len ) )		\
 					return FASTERJSON_ERROR_JSON_INVALID;				\
 			}										\
-			if( *(_begin_) == 'n' )								\
+			else if( *(_begin_) == 'n' )							\
 			{										\
 				if( len != 4 || MEMCMP( (_begin_) , != , "null" , len ) )		\
 					return FASTERJSON_ERROR_JSON_INVALID;				\
@@ -277,30 +277,30 @@ char		g_fasterjson_encoding = FASTERJSON_ENCODING_UTF8 ;
 static int _TravelJsonArrayBuffer( char top , register char **json_ptr , char *jpath , int jpath_len , int jpath_size
 	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
 	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
-	 , funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
-	 , funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p , char *array_nodename , int array_nodename_len );
 static int _TravelJsonLeafBuffer( char top , register char **json_ptr , char *jpath , int jpath_len , int jpath_size
 	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
 	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
-	 , funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
-	 , funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p );
 static int _TravelJsonBuffer( char top , register char **json_ptr , char *jpath , int jpath_len , int jpath_size
 	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
 	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
-	 , funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
-	 , funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p );
 
 static int _TravelJsonArrayBuffer( char top , register char **json_ptr , char *jpath , int jpath_len , int jpath_size
 	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonBranch
 	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonBranch
-	 , funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
-	 , funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnEnterJsonArray
+	, funcCallbackOnJsonNode *pfuncCallbackOnLeaveJsonArray
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p , char *array_nodename , int array_nodename_len )
 {
@@ -488,7 +488,7 @@ static int _TravelJsonLeafBuffer( char top , register char **json_ptr , char *jp
 	, void *p )
 {
 	char		*begin ;
-	int		len ;
+	int		len = 0 ;
 	signed char	tag ;
 	signed char	quotes , quotes_bak ;
 	
@@ -820,7 +820,7 @@ static int _TravelJsonBuffer( char top , register char **json_ptr , char *jpath 
 	, void *p )
 {
 	char		*begin ;
-	int		len ;
+	int		len = 0 ;
 	signed char	tag ;
 	signed char	quotes ;
 	
@@ -837,9 +837,9 @@ static int _TravelJsonBuffer( char top , register char **json_ptr , char *jpath 
 			nodename = begin ;
 			nodename_len = len ;
 			
-			if( pfuncCallbackOnEnterJsonArray )
+			if( pfuncCallbackOnEnterJsonBranch )
 			{
-				nret = (*pfuncCallbackOnEnterJsonArray)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_ARRAY , jpath , jpath_len , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
+				nret = (*pfuncCallbackOnEnterJsonBranch)( FASTERJSON_NODE_ENTER | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
 				if( nret > 0 )
 					break;
 				else if( nret < 0 )
@@ -856,9 +856,9 @@ static int _TravelJsonBuffer( char top , register char **json_ptr , char *jpath 
 			if( nret )
 				return nret;
 			
-			if( pfuncCallbackOnLeaveJsonArray )
+			if( pfuncCallbackOnLeaveJsonBranch )
 			{
-				nret = (*pfuncCallbackOnLeaveJsonArray)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_ARRAY , jpath , jpath_len , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
+				nret = (*pfuncCallbackOnLeaveJsonBranch)( FASTERJSON_NODE_LEAVE | FASTERJSON_NODE_BRANCH , jpath , jpath_len , jpath_size , nodename , nodename_len , NULL , 0 , p ) ;
 				if( nret > 0 )
 					break;
 				else if( nret < 0 )

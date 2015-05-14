@@ -1,3 +1,6 @@
+ver 1.1.2	2015-05-13	calvin
+		* Fixed a problem about encoding
+
 ver 1.1.1	2015-05-02	calvin
 		* Passed json standard calibration testing by 'test/data/*' , with some fault tolerance
 

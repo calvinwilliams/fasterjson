@@ -125,6 +125,9 @@ LEAF         p[hello world] jpath[/root2] nodename[root2] content[leaf2]
 
 You can transform event callback function, rapid access JSON nodes, for example, according to certain JPATH then fill c struct members.
 
+To multi-byte , set global var g_fasterjson_encoding to change encoding , such as FASTERJSON_ENCODING_UTF8 and FASTERJSON_ENCODING_GB18030 , and default for UTF8.
+for example : g_fasterjson_encoding = FASTERJSON_ENCODING_GB18030 ;
+
 4.Performance
 
 Fastjson's performance is very high, below is fasterjson and rapidjson pressure measurement

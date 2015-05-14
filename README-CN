@@ -125,6 +125,9 @@ LEAF         p[hello world] jpath[/root2] nodename[root2] content[leaf2]
 
 客户可以改造事件回调函数，实现快速遍历访问JSON，比如根据JSON某些JPATH数据填充一个C结构体相关成员。
 
+对于多字节字，可设置全局变量g_fasterjson_encoding以支持对应编码，目前取值有FASTERJSON_ENCODING_UTF8和FASTERJSON_ENCODING_GB18030，默认为UTF8。
+如：g_fasterjson_encoding = FASTERJSON_ENCODING_GB18030 ;
+
 4.性能
 
 fasterjson的性能非常高，下面是fasterjson与目前宣称最快JSON解析器rapidjson的压测比较
