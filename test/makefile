@@ -17,11 +17,11 @@ BIN		=	test_fasterjson \
 
 ###### 编译选项
 CFLAGS		=	-I. \
-			-I$(HOME)/exinc/fasterjson \
+			-I/usr/local/include/fasterjson \
 
 ###### 链接选项
 LFLAGS		=	-L. \
-			-L$(HOME)/exlib \
+			-L/usr/local/lib \
 			-lfasterjson \
 
 ###### 额外宏定义区

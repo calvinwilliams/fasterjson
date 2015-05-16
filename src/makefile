@@ -12,11 +12,11 @@ c_FILE		=	\
 
 ###### 目标文件、安装目录配置区
 LIB		=	libfasterjson.so
-LIBINST		=	$(HOME)/exlib
+LIBINST		=	/usr/local/lib
 HDER		= \
 			fasterjson.h \
 
-HDERINST	=	$(HOME)/exinc/fasterjson
+HDERINST	=	/usr/local/include/fasterjson
 
 ###### 编译选项
 CFLAGS		=	-I. \

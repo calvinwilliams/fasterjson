@@ -33,11 +33,11 @@ c_FILE		=	\
 
 ###### 目标文件、安装目录配置区
 LIB		=	libfasterjson.so
-LIBINST		=	/usr/lib
+LIBINST		=	/usr/local/lib
 HDER		= \
 			fasterjson.h \
 
-HDERINST	=	/usr/include/fasterjson
+HDERINST	=	/usr/local/include/fasterjson
 
 ###### 编译选项
 CFLAGS		=	-I. \
