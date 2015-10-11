@@ -22,8 +22,8 @@ $ cd src
 $ make -f makefile.Linux install
 gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -I.  -c fasterjson.c
 gcc -g -fPIC -O2 -Wall -Werror -fno-strict-aliasing -o libfasterjson.so fasterjson.o -shared -L.
-cp -f libfasterjson.so /usr/lib/exlib/
-cp -f fasterjson.h /usr/include/fasterjson/
+cp -f libfasterjson.so $HOME/lib/
+cp -f fasterjson.h $HOME/include/fasterjson/
 [/code]
 
 3.基本使用

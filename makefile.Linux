@@ -59,12 +59,27 @@ clean	:
 # install规则
 .PHONY:install
 install	:
-	echo $(MAKE)
 	@for i in $(DIROBJS) ; do \
 		if [ -d "$$i" ] ; then \
 			if [ -f "$$i/makefile$(MAKEFILE_POSTFIX)" ] ; then \
 				$(CD) $$i ; \
 				$(MAKE) -f makefile$(MAKEFILE_POSTFIX) install ; \
+				if [ $$? -ne 0 ] ; then \
+					exit 1 ; \
+				fi ; \
+				$(CD) .. ; \
+			fi ; \
+		fi ; \
+	done
+
+# uninstall规则
+.PHONY:uninstall
+uninstall	:
+	@for i in $(DIROBJS) ; do \
+		if [ -d "$$i" ] ; then \
+			if [ -f "$$i/makefile$(MAKEFILE_POSTFIX)" ] ; then \
+				$(CD) $$i ; \
+				$(MAKE) -f makefile$(MAKEFILE_POSTFIX) uninstall ; \
 				if [ $$? -ne 0 ] ; then \
 					exit 1 ; \
 				fi ; \
