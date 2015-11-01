@@ -304,8 +304,8 @@ static int _TravelJsonArrayBuffer( char top , register char **json_ptr , char *j
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p , char *array_nodename , int array_nodename_len )
 {
-	char		*begin ;
-	int		len ;
+	char		*begin = NULL ;
+	int		len = 0 ;
 	signed char	tag ;
 	signed char	quotes ;
 	
@@ -487,7 +487,7 @@ static int _TravelJsonLeafBuffer( char top , register char **json_ptr , char *jp
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p )
 {
-	char		*begin ;
+	char		*begin = NULL ;
 	int		len = 0 ;
 	signed char	tag ;
 	signed char	quotes , quotes_bak ;
@@ -819,7 +819,7 @@ static int _TravelJsonBuffer( char top , register char **json_ptr , char *jpath 
 	, funcCallbackOnJsonNode *pfuncCallbackOnJsonLeaf
 	, void *p )
 {
-	char		*begin ;
+	char		*begin = NULL ;
 	int		len = 0 ;
 	signed char	tag ;
 	signed char	quotes ;
