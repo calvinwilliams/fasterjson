@@ -6,24 +6,24 @@
 --------------------Configuration: fasterjson - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP194.tmp" with contents
+Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPCD.tmp" with contents
 [
 /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FASTERJSON_EXPORTS" /Fp"Debug/fasterjson.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"D:\Work\C Projects\fasterjson-1.0.2\src\fasterjson.c"
+"D:\Work\gitfiles\oschina.net\fasterjson\src\fasterjson.c"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP194.tmp" 
-Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP195.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPCD.tmp" 
+Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPCE.tmp" with contents
 [
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"Debug/fasterjson.pdb" /debug /machine:I386 /out:"Debug/fasterjson.dll" /implib:"Debug/fasterjson.lib" /pdbtype:sept 
-".\Debug\fasterjson.obj"
+.\Debug\fasterjson.obj
 ]
-Creating command line "link.exe @C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP195.tmp"
+Creating command line "link.exe @C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPCE.tmp"
 <h3>Output Window</h3>
 Compiling...
 fasterjson.c
 Linking...
    Creating library Debug/fasterjson.lib and object Debug/fasterjson.exp
-Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP199.bat" with contents
+Creating temporary file "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPD2.bat" with contents
 [
 @echo off
 mkdir "%ProgramFiles%\fasterjson"
@@ -34,7 +34,7 @@ copy Debug\fasterjson.lib "%ProgramFiles%\fasterjson\lib" /Y
 mkdir "%ProgramFiles%\fasterjson\bin"
 copy Debug\fasterjson.dll "%ProgramFiles%\fasterjson\bin" /Y
 ]
-Creating command line "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSP199.bat"
+Creating command line "C:\DOCUME~1\calvin\LOCALS~1\Temp\RSPD2.bat"
 
 子目录或文件 C:\Program Files\fasterjson 已经存在。
 子目录或文件 C:\Program Files\fasterjson\include 已经存在。

@@ -9,8 +9,6 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-extern int __FASTERJSON_VERSION_1_1_1 ;
-
 /* util */
 
 #if ( defined _WIN32 )
@@ -19,7 +17,7 @@ extern int __FASTERJSON_VERSION_1_1_1 ;
 #endif
 #elif ( defined __unix ) || ( defined __linux__ )
 #ifndef _WINDLL_FUNC
-#define _WINDLL_FUNC
+#define _WINDLL_FUNC		extern
 #endif
 #endif
 
@@ -306,7 +304,7 @@ _WINDLL_FUNC int TravelJsonBuffer4( char *json_buffer , char *jpath , int jpath_
 
 #define FASTERJSON_ENCODING_UTF8		0 /* UTF-8 */
 #define FASTERJSON_ENCODING_GB18030		1 /* GB18030/GBK/GB2312 */
-extern char		g_fasterjson_encoding ;
+_WINDLL_FUNC char		g_fasterjson_encoding ;
 
 #ifdef __cplusplus
 }

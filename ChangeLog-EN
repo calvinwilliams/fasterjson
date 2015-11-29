@@ -1,3 +1,6 @@
+ver 1.1.5	2015-11-29	calvin
+		* Solved a problem about exporting global varible g_fasterjson_encoding
+
 ver 1.1.4	2015-11-01	calvin
 		* Solved uninitialized variables 'begin' in some compilers
 

@@ -13,7 +13,7 @@
 #define MAX(_a_,_b_) (_a_>_b_?_a_:_b_)
 #endif
 
-int __FASTERJSON_VERSION_1_1_2 = 0 ;
+int __FASTERJSON_VERSION_1_1_5 = 0 ;
 
 #define FASTERJSON_TOKEN_EOF		-1
 #define FASTERJSON_TOKEN_LBB		1	/* { */

@@ -1,3 +1,6 @@
+ver 1.1.5	2015-11-29	calvin
+		* 解决了导出全局变量g_fasterjson_encoding的问题
+
 ver 1.1.4	2015-11-01	calvin
 		* 解决了在某些编译器因对宏处理不好而误报变量begin未初始化
 
