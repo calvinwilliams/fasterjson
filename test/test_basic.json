@@ -1,0 +1,17 @@
+{
+	"root" :
+	{
+		"leaf" : "content" ,
+		"true_leaf" : true ,
+		"false_leaf" : false ,
+		"null_leaf" : null ,
+		"sub_branch":
+		{
+			"sub_leaf":"sub_content" ,
+			"sub_leaf 2":"sub_content 2"
+		}
+	} ,
+	"root2" : "leaf2" ,
+	"array_with_key" : [ { "n1":1.0 , "n2":2.0 , "n3":3.0 } ] ,
+	"array_with_nokey" : [ 1.0 , 2.0 , 3.0 ]
+}

@@ -1,96 +1,35 @@
-ver 1.5.0	2015-11-29	calvin
-		* 生成代码的一些小调整
-		* 新增导出JSON文本函数*_JSON_DUP_*
-		内部申请导出缓冲区，需要应用自己释放
-			base = NULL ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , NULL , NULL ) ;
-		|| 内部申请时初始化大小
-			base = NULL ;
-			buf_size = 1024 ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , & buf_size , NULL ) ;
-		|| 应用预申请好，但导出时不足时，内部调整；len输出实际填充长度
-			base = malloc( 1024 ) ;
-			buf_size = 1024 ;
-			len = buf_size - 1 ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , & buf_size , & len ) ;
-		|| 当len < buf_size - 1时，会预留ptr前面一块空间；len输出实际填充长度
+ver 1.1.6	2016-04-26	calvin
+		* * 加入null支持
 
-ver 1.4.5	2015-05-26	calvin
-		* 又修正了多层循环中的代码生成问题
+ver 1.1.5	2015-11-29	calvin
+		* 解决了导出全局变量g_fasterjson_encoding的问题
 
-ver 1.4.4	2015-05-22	calvin
-		* 修正了多层循环中的代码生成问题
+ver 1.1.4	2015-11-01	calvin
+		* 解决了在某些编译器因对宏处理不好而误报变量begin未初始化
 
-ver 1.4.3	2015-05-12	calvin
-		* 缓冲区长度计算更准确
+ver 1.1.3	2015-06-17	calvin
+		* 随mktpl V2.0.10重整makefile
+
+ver 1.1.2	2015-05-13	calvin
+		* 解决了一个字符编码的问题
 		* 调整了makefile*
 
-ver 1.4.2	2015-05-11	calvin
-		* 解决了序列化XML,JSON时的缓冲区溢出问题
-		* 序列化XML,JSON明细时按照隐藏字段_*_count计算次数
+ver 1.1.1	2015-05-02	calvin
+		* 通过json标准测试文件(test/data/*)校验，并带有一定的容错性
 
-ver 1.4.1	2015-05-02	calvin
-		* 配合开源库fasterjson v1.1.1改造
+ver 1.1.0	2015-05-01	calvin
+		* 新增UTF-8或GB18030/GBK/GB2312编码支持
+		* 新增\uxxxx特殊转移解码支持
 
-ver 1.4.0	2015-05-01	calvin
-		* 配合开源库fasterjson v1.1.0改造
-		* json序列化新增匿名数组表达支持，如"name:[1,2,3,4,5,6]"，定义字段名时前加'_'
-		* 新增json压测程序test/press_deserialize_json
-		* 新增UTF8的json测试程序test/test_serialize_json_utf8
-		* 定义字段类型新增布尔类型BOOL，代码中使用DSCTRUE或DSCFALSE赋值
+ver 1.0.3	2015-04-29	calvin
+		* 关键段性能优化
 
-ver 1.3.3	2015-04-25	calvin
-		* 生成的XML或JSON报文会根据内部变量"_*_count"值而减少输出量
+ver 1.0.2	2015-03-16	calvin
+		* 解决了处理双字节字时的一个问题
+		* 解决了一个缓冲区溢出保护的问题
 
-ver 1.3.2	2015-03-21	calvin
-		* 补全函数DSCDESERIALIZE_JSON_COMPACT_*
+ver 1.0.1	2014-12-14	calvin
+		* 修正了字符串用单引号括起来的识别问题
 
-ver 1.3.1	2015-03-16	calvin
-		* 配合开源库fasterjson改造dsc自动生成代码
-
-ver 1.3.0	2015-03-14	calvin
-		* 修正了SQL条件为<>,<=,>=时的ec自动代码生成问题
-		* 把dsc命令行参数包含pqsql改成pgsql
-		* 把dsc命令行参数-sql拆成-sql-pgsql,-sql-oracle
-		* 新增JSON紧缩风格的序列化函数
-		* 新增XML紧缩风格的序列化函数
-
-ver 1.2.0	2015-02-12	calvin
-		* 解决不能编译问题，去掉了自动生成的代码中引用返回值宏FASTERJSON_INFO_END_OF_BUFFER,FASTERXML_INFO_END_OF_BUFFER
-		* 去掉了生成的JSON报文中顶层结构体名作为根节点。谨慎升级！
-
-ver 1.1.3	2014-11-21	calvin
-		* 新增根据关键字SQLCONN自动生成CONNECT,DISCONNECT,BEGINWORK,COMMIT,ROLLBACK函数
-		* 新增注释语法
-
-ver 1.1.2	2014-10-10	calvin
-		* ESQL新增自动生成SQLACTION代码
-		* 修正了XML、JSON序列化/反序列化函数中的一个BUG
-		* 支持ORACLE了
-
-ver 1.1.1	2014-10-07	calvin
-		* 新增综合示例 test_client,test_server
-		* 新增综合示例 test_db2json
-
-ver 1.1.0	2014-09-20	calvin
-		* 新增自动生成代码:XML序列化/反序列化函数，依赖开源库fasterxml
-		* 新增自动生成代码:JSON序列化/反序列化函数，依赖开源库fasterjson
-		* 新增自动生成代码:ESQL代码
-		* 支持PGSQL了
-
-ver 1.0.4	2014-09-09	calvin
-		* 修正了AIX上的编译问题
-		* 修正了浮点数的字节序问题
-		* 优化了自动生成代码的布局
-		* 自动生成代码前的工具版本信息
-
-ver 1.0.3	2014-09-05	calvin
-		* 新增自动生成代码 : 精简/压缩序列化/反序列化函数
-
-ver 1.0.1	2014-09-01	calvin
-		* 新增类型 INT 8 和 UINT (1,2,4,8) 和 UCHAR
-
-ver 1.0.0	2014-08-29	calvin
+ver 1.0.0	2014-10-02	calvin
 		* 创建
-		* 读入抽象定义文件
-		* 新增自动生成代码 : 网络/主机字节序化函数、打印所有字段日志函数

@@ -8,28 +8,20 @@
 ###### 源文件配置区
 #@ c_FILE
 c_FILE		=	\
-			main.c \
-			dsc.c \
-			ReadDscFile.c \
-			GenerateCCode.c \
-			GenerateECCode.c \
-			GenerateSqlCode.c \
-			util.c \
+			fasterjson.c \
 
 ###### 目标文件、安装目录配置区
 include ../makeinstall
-BIN		=	dsc
-BININST		=	$(_BININST)
-HDER		= \
-			dsc.h \
-
+LIB		=	libfasterjson.so
+LIBINST		=	$(_LIBINST)
+HDER		=	fasterjson.h
 HDERINST	=	$(_HDERINST)
 
 ###### 编译选项
-CFLAGS		=	$(_CFLAGS) \
+CFLAGS		=	$(_CFLAGS)
 
 ###### 链接选项
-LFLAGS		=	$(_LFLAGS) \
+LFLAGS		=	$(_LFLAGS)
 
 ###### 额外宏定义区
 CLEAN_ADDITION	=
@@ -38,16 +30,17 @@ CLEAN_ADDITION	=
 #@ make_all
 #@ make_clean
 #@ make_install
-#@ make_install_BININST
+#@ make_install_LIBINST
 #@ make_install_HDERINST
 #@ make_install_DFTHDERINST
 #@ make_uninstall
-#@ make_uninstall_BININST
+#@ make_uninstall_LIBINST
 #@ make_uninstall_HDERINST
 #@ make_uninstall_DFTHDERINST
+
 include $(MKTPLDIR)/makeobj_$(MKTPLOS).inc
 
 ###### 目标文件依赖关系
-dsc		:	$(c_FILE_o)
-	$(CC) -o $@ $(c_FILE_o) $(LFLAGS)
+libfasterjson.so		:	$(c_FILE_o)
+	$(CC) -o $@ $(c_FILE_o) $(SOFLAGS) $(LFLAGS)
 

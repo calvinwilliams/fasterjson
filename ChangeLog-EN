@@ -1,96 +1,35 @@
-ver 1.5.0	2015-11-29	calvin
-		* Some adjustion in generate codes
-		* Add json dump funcation by alloc memory internally
-		Alloc memory internally , application free memory
-			base = NULL ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , NULL , NULL ) ;
-		|| alloc initial size internally
-			base = NULL ;
-			buf_size = 1024 ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , & buf_size , NULL ) ;
-		|| application alloc memory , realloc on needs internally ; len output fill-length actually
-			base = malloc( 1024 ) ;
-			buf_size = 1024 ;
-			len = buf_size - 1 ;
-			nret = DSCSERIALIZE_JSON_DUP_BankJsonTransaction( & st , NULL , & ptr , & buf_size , & len ) ;
-		|| reserving space on len < buf_size - 1 ; len output fill-length actually
+ver 1.1.6	2016-04-26	calvin
+		* Support `null`
 
-ver 1.4.5	2015-05-22	calvin
-		* Fixed a bug on multi-loop too
+ver 1.1.5	2015-11-29	calvin
+		* Solved a problem about exporting global varible g_fasterjson_encoding
 
-ver 1.4.4	2015-05-22	calvin
-		* Fixed a bug on multi-loop
+ver 1.1.4	2015-11-01	calvin
+		* Solved uninitialized variables 'begin' in some compilers
 
-ver 1.4.3	2015-05-12	calvin
-		* Precise buffer length calculation
+ver 1.1.3	2015-06-17	calvin
+		* Perform makefile with mktpl V2.0.10
+
+ver 1.1.2	2015-05-13	calvin
+		* Fixed a problem about encoding
 		* Adjust makefile*
 
-ver 1.4.2	2015-05-11	calvin
-		* Fixed a bug on serializing XML,JSON
-		* Effect field '_*_count' on serializing XML,JSON
+ver 1.1.1	2015-05-02	calvin
+		* Passed json standard calibration testing by 'test/data/*' , with some fault tolerance
 
-ver 1.4.1	2015-05-02	calvin
-		* Adjust by library fasterjson v1.1.1
+ver 1.1.0	2015-05-01	calvin
+		* Support encoding UTF-8 or GB18030/GBk/GB2312
+		* Support uneacape for "\uxxxx"
 
-ver 1.4.0	2015-05-01	calvin
-		* Adjust by library fasterjson v1.1.0
-		* Support json expression as like "name:[1,2,3,4,5,6]" , add prefix '_' on defining field in IDL file
-		* Add test program 'test/press_deserialize_json' for pressing
-		* Add test program 'test/test_deserialize_json_utf8' for encoding UTF8
-		* Add field type 'BOOL' on defining field in IDL file , use macro DSCTRUE or DSCFALSE in code
+ver 1.0.3	2015-04-29	calvin
+		* Performance optimization
 
-ver 1.3.3	2015-04-25	calvin
-		* Increase output by internal varible "_*_count" on XML or JSON serializing
+ver 1.0.2	2015-03-16	calvin
+		* Fixed a problem when dealing with double-byte characters
+		* Fixed a problem of buffer overflow protection
 
-ver 1.3.2	2015-03-21	calvin
-		* Completion function DSCDESERIALIZE_JSON_COMPACT_*
+ver 1.0.1	2014-12-14	calvin
+		* Fixed a problems that string enclosed in single-quotation
 
-ver 1.3.1	2015-03-16	calvin
-		* Adjust by library fasterjson
-
-ver 1.3.0	2015-03-14	calvin
-		* Fixed ec automatic code generation problems of SQL conditions for <>, <=, >=
-		* Adjust to 'pgsql' on command line parameters include 'pqsql'
-		* Unwrapped command line parameters '-sql' into '-sql-pgsql' and '-sql-oracle'
-		* Add compactly json style serialization function
-		* Add compactly xml style serialization function
-
-ver 1.2.0	2015-02-12	calvin
-		* Solve a compile problem , remove the auto-generated code in the return value macro FASTERJSON_INFO_END_OF_BUFFER FASTERXML_INFO_END_OF_BUFFER 
-		* Remove the top structure name of the generated JSON message as a root node. Cautious upgrade! 
-
-ver 1.1.3	2014-11-21	calvin
-		* Add generate code automatically : CONNECT,DISCONNECT,BEGINWORK,COMMIT,ROLLBACK with keyword SQLCONN
-		* Add comment grammar
-
-ver 1.1.2	2014-10-10	calvin
-		* ESQL add generate SQLACTION code
-		* Fixed bug in XML,JSON serialize/unserialize functions
-		* Support ORACLE
-
-ver 1.1.1	2014-10-07	calvin
-		* Add demo test_client,test_server
-		* Add demo test_db2json
-
-ver 1.1.0	2014-09-20	calvin
-		* Add generate code automatically : XML serialize/unserialize functions , Depend on library fasterxml
-		* Add generate code automatically : JSON serialize/unserialize functions , Depend on library fasterjson
-		* Add generate code automatically : ESQL code
-		* Support PQSQL
-
-ver 1.0.4	2014-09-09	calvin
-		* Fixed a problem on AIX
-		* Fixed a problem about float-number
-		* Optimized generate automatically code layout
-		* Generate code header ( dsc version )
-
-ver 1.0.3	2014-09-05	calvin
-		* Add generate code automatically : compack/compress serialize/unserialize functions
-
-ver 1.0.1	2014-09-01	calvin
-		* Add type INT 8 and UINT (1,2,4,8) and UCHAR
-
-ver 1.0.0	2014-08-29	calvin
+ver 1.0.0	2014-10-02	calvin
 		* Create
-		* Read abstract definition file
-		* Add generate code automatically : network/host byte-order convert functions , log output function
